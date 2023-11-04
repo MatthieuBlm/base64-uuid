@@ -13,8 +13,10 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 	@Serial
 	private static final long serialVersionUID = 8193871979895082781L;
 	
-	private static final Encoder encoder = Base64.getUrlEncoder();
-	private static final Decoder decoder = Base64.getUrlDecoder();
+	private static final Encoder base64UrlEncoder = Base64.getUrlEncoder();
+	private static final Decoder base64UrlDecoder = Base64.getUrlDecoder();
+	private static final Encoder base64Encoder = Base64.getEncoder();
+	private static final Decoder base64Decoder = Base64.getDecoder();
 	
 	private final UUID value;
 	
@@ -45,7 +47,14 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 			throw new IllegalArgumentException(String.format("The given base64 UUID %s is too short", base64));
 		}
 		
-		ByteBuffer buffer = ByteBuffer.wrap(decoder.decode(base64));
+		ByteBuffer buffer = null;
+		
+		if(base64.contains("/") || base64.contains("+")) {
+			buffer = ByteBuffer.wrap(base64Decoder.decode(base64));
+		} else {
+			buffer = ByteBuffer.wrap(base64UrlDecoder.decode(base64));
+		}
+		
 		return new B64UUID(new UUID(buffer.getLong(), buffer.getLong()));
 	}
 	
@@ -84,15 +93,14 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 	public long node() {
 		return this.value.node();
 	}
-
+	
+	public String value() {
+		return base64Encoder.encodeToString(getBytes()).substring(0, 22);
+	}
+	
     @Override
     public String toString() {
-        byte[] src = ByteBuffer.wrap(new byte[16])
-                .putLong(value.getMostSignificantBits())
-                .putLong(value.getLeastSignificantBits())
-                .array();
-        
-        return encoder.encodeToString(src).substring(0, 22);
+        return base64UrlEncoder.encodeToString(getBytes()).substring(0, 22);
     }
 
 	@Override
@@ -128,5 +136,12 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 		}
 		
 		return this.value.compareTo(o.value);
+	}
+	
+	private byte[] getBytes() {
+		return ByteBuffer.wrap(new byte[16])
+                .putLong(value.getMostSignificantBits())
+                .putLong(value.getLeastSignificantBits())
+                .array();
 	}
 }
