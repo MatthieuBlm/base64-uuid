@@ -81,7 +81,7 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 	 * Constructs a new {@code B64UUID} from a base64 string.
 	 * 
 	 * @param base64 the string base64 encoded. It can contains '-' and '_'
-	 * that will be taken as base64 characters '/' or '+'.
+	 * that will be taken as base64 characters '+' or '/'.
 	 * 
 	 * @return the new {@code B64UUID} created.
 	 */
@@ -180,7 +180,7 @@ public final class B64UUID implements Serializable, Comparable<B64UUID> {
 	
 	/**
 	 * Generate a base64 representation of this {@code B64UUID} as string. The
-	 * built string will not contains '/' or '+' but respectively '-' or '_' 
+	 * built string will not contains '+' or '/' but respectively '-' or '_' 
 	 * instead. The purpose is allow putting returned string in URL without any
 	 * other manipulation.
 	 */
